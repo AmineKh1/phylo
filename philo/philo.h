@@ -18,6 +18,7 @@
 # include <math.h>
 # include <sys/time.h>
 # include <pthread.h>
+# include <unistd.h>
 typedef struct s_philo
 {
     pthread_t *th_philo;
@@ -29,9 +30,11 @@ typedef struct s_philo
 	int nbr_philo;
 	int nbr_forks;
 	int i;
+	int ms_past;
     struct timeval  time;
+	struct timeval  timepast;
 }       t_philo;
-
-
-
+int	time_past(t_philo *ph);
+int	msleep(t_philo *ph, int sleep);
+void*	act_philo(void *ph);
 #endif

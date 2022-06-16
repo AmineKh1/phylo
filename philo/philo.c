@@ -12,15 +12,43 @@
 
 #include "philo.h"
 
-// int	time_past(t_philo p)
-// {
-	
-// }
+
+int	msleep(t_philo *ph, int sleep)
+{
+	int past;
+	past = sleep * 90 / 100;
+	// gettimeofday(&ph->time, NULL);
+	usleep(sleep * 1000);
+	gettimeofday(&ph->timepast, NULL);
+	// while(time_past(ph) < 200)
+	// {
+	// 	usleep(1);
+	// 	gettimeofday(&ph->timepast, NULL);
+	// }
+	return time_past(ph);
+}
+int	time_past(t_philo *ph)
+{
+	int r;
+	int past;
+
+	past = ph->timepast.tv_sec * 1000 + ph->timepast.tv_usec / 1000;
+	r = ph->time.tv_sec * 1000 + ph->time.tv_usec / 1000;
+	return past - r;
+}
 void*	act_philo(void *ph)
 {
 	t_philo p;
+	int i;
 	p = *(t_philo*) ph;
-	printf("%d\n", p.i);
+	i = p.i;
+	// msleep(&p, 5 * (10 - i + 1));
+	// gettimeofday(&p.time, NULL);
+	// while(1)
+	// {
+		printf("%d %d has taken a fork\n", msleep(&p, p.tm_eat), i);
+	// }
+	// printf("%d\n", i);
 	return 0;
 }
 int	main(int argc, char **argv)
@@ -32,8 +60,6 @@ int	main(int argc, char **argv)
 	t_philo ph;
 	
 	gettimeofday(&ph.time, NULL);
-	printf("%ld\n%d\n", ph.time.tv_sec, ph.time.tv_usec);
-	exit(0);
 	ph.i = -1;
 	ph.tm_die = atoi(argv[2]);	
 	ph.tm_eat = atoi(argv[3]);
@@ -41,16 +67,15 @@ int	main(int argc, char **argv)
 	ph.tm_p_eat = atoi(argv[6]);
 	ph.nbr_philo = atoi(argv[1]);
 	ph.nbr_forks = atoi(argv[1]);
-	ph.th_philo = malloc ((ph.nbr_philo + 1) * sizeof(pthread_t));
+	ph.th_philo = malloc ((ph.nbr_philo) * sizeof(pthread_t));
 	ph.mutex = malloc((ph.nbr_forks) * sizeof(pthread_mutex_t));
-	ph.th_philo[ph.nbr_philo] = 0;
 	while(++ph.i < ph.nbr_forks)
 		pthread_mutex_init(&ph.mutex[ph.i], NULL);
 	ph.i = -1;
-	while (++ph.i < ph.nbr_philo)
+	while (++ph.i <= ph.nbr_philo)
 	{
+		msleep(&ph, 100);
 		pthread_create(&ph.th_philo[ph.i], NULL, &act_philo, &ph);
-		pthread_join(ph.th_philo[ph.i], NULL);
 	}
 	
 	
