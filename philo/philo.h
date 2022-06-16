@@ -22,7 +22,7 @@
 typedef struct s_philo
 {
     pthread_t *th_philo;
-    pthread_mutex_t *mutex;
+    pthread_mutex_t mutex;
 	int tm_die;	
 	int tm_eat;
 	int tm_sleep;
