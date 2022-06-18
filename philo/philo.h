@@ -22,7 +22,7 @@
 typedef struct s_philo
 {
     pthread_t *th_philo;
-    pthread_mutex_t mutex;
+    pthread_mutex_t *mutex;
 	int tm_die;	
 	int tm_eat;
 	int tm_sleep;
@@ -31,6 +31,8 @@ typedef struct s_philo
 	int nbr_forks;
 	int i;
 	int ms_past;
+	int end;
+	int time_past;
     struct timeval  time;
 	struct timeval  timepast;
 }       t_philo;
