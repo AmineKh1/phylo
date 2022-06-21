@@ -25,16 +25,22 @@ int	msleep(t_philo *ph, int sleep)
 	// 	sleep = ph->tm_eat;
 	int past;
 	// gettimeofday(&ph->time, NULL);
-	past = sleep - 20;
+	// if(sleep > 80)
+		past = sleep - 20;
+	// else
+	// 	past = 0;
 	usleep(past * 1000);
 	gettimeofday(&ph->timepast, NULL);
-	while(time_past(ph) < 200)
+	sleep = sleep + ph->increment;
+	while(time_past(ph) < sleep)
 	{
-		usleep(1);
+		usleep(100);
 		gettimeofday(&ph->timepast, NULL);
 	}
-	return time_past(ph);
+	ph->increment = time_past(ph);
+	return ph->increment;
 }
+
 int	time_past(t_philo *ph)
 {
 	int r;
@@ -44,45 +50,84 @@ int	time_past(t_philo *ph)
 	r = ph->time.tv_sec * 1000 + ph->time.tv_usec / 1000;
 	return past - r;
 }
+int	time_past_die(t_philo *ph)
+{
+	int r;
+	int past;
+
+	past = ph->end_die.tv_sec * 1000 + ph->end_die.tv_usec / 1000;
+	r = ph->die_calcul.tv_sec * 1000 + ph->die_calcul.tv_usec / 1000;
+	return past - r;
+}
 void*	act_philo(void *ph)
 {
-
-	t_philo *p;
 	int i;
-	int fork;
-	int j;
+	
+	t_philo *p;
 	p = (t_philo*) ph;
-	i = p->i + 1;
+	i = p->i;
+	int fork;
+	int count = 0;
+	int j;
+	
+	
 	j = 0;
+	
 	while(j++ < p->tm_p_eat)
 	{
+		gettimeofday(&p.die_calcul[i]);
 		fork = i + 1;
-		if (fork > p->nbr_philo)
-			fork = 1;
+		if (fork > p->nbr_philo - 1)
+			fork = 0;
 		if(i % 2 == 0)
 		{
 			pthread_mutex_lock(&p->mutex[fork]);
-			printf("%d %d has taken a fork %d\n", msleep(p, p->tm_eat), i, fork);
+			printf("%d %d has taken a fork %d\n", time_past(p), i + 1, fork + 1);
 			pthread_mutex_lock(&p->mutex[i]);
-			printf("%d %d has taken a fork %d\n", msleep(p, p->tm_eat), i, i);
+			printf("%d %d has taken a fork %d\n", time_past(p), i + 1, i + 1);
+			msleep(p, p->tm_eat);
+			p->philo_eat[i]++;
 			pthread_mutex_unlock(&p->mutex[fork]);
 			pthread_mutex_unlock(&p->mutex[i]);
-			printf("%d %d is sleeping\n", msleep(p, p->tm_eat), i);
+			printf("%d %d is sleeping\n", time_past(p), i + 1);
+			msleep(p, p->tm_sleep);
+			printf("%d %d is thinking\n", time_past(p), i + 1);
 		}
-		else
+		else  
 		{
 			pthread_mutex_lock(&p->mutex[i]);
-			printf("%d %d has taken a fork %d\n",msleep(p, p->tm_eat), i, i);
-			
+			printf("%d %d has taken a fork %d\n",time_past(p), i + 1, i + 1);
 			pthread_mutex_lock(&p->mutex[fork]);
-			printf("%d %d has taken a fork %d\n",msleep(p, p->tm_eat), i, fork);
+			printf("%d %d has taken a fork %d\n", time_past(p), i + 1, fork + 1);
+			msleep(p, p->tm_eat);
+			p->philo_eat[i]++;
 			pthread_mutex_unlock(&p->mutex[i]);
 			pthread_mutex_unlock(&p->mutex[fork]);
-			printf("%d %d is sleeping\n",msleep(p, p->tm_sleep), i);
+			printf("%d %d is sleeping\n", time_past(p), i + 1);
+			msleep(p, p->tm_sleep);
+			printf("%d %d is thinking\n", time_past(p), i + 1);
 		}
 	}
 	p->end++;
 	// printf("%d\n", i);
+	return 0;
+}
+void*	die_sup(void *ph)
+{
+
+	t_philo *p;
+	int i;
+	int time;
+	p = (t_philo*) ph;
+	i = 0;
+	while(1)
+	{
+		while(i++ < nbr_philo)
+		{
+			if(time_past_die(p, i) >= tm_die)// need complite this part of implimentation of die of philo, check about philo it with the struct timeval and the algo
+
+		}
+	}
 	return 0;
 }
 int	main(int argc, char **argv)
@@ -96,7 +141,6 @@ int	main(int argc, char **argv)
 
 	
 	ph.i = -1;
-	time_past = 0;
 	ph.tm_die = atoi(argv[2]);	
 	ph.tm_eat = atoi(argv[3]);
 	ph.tm_sleep = atoi(argv[4]);
@@ -104,18 +148,27 @@ int	main(int argc, char **argv)
 	ph.nbr_philo = atoi(argv[1]);
 	ph.nbr_forks = atoi(argv[1]);
 	ph.end = 0;
+	ph.increment = 0;
 	ph.th_philo = malloc ((ph.nbr_philo) * sizeof(pthread_t));
 	ph.mutex = malloc((ph.nbr_philo) * sizeof(pthread_mutex_t));
+	ph.die_calcul = malloc((ph.nbr_philo) * sizeof(struct timeval));
+	ph.end_die = malloc((ph.nbr_philo) * sizeof(struct timeval));
+	ph.philo_eat = malloc((ph.nbr_philo) * sizeof(int));
 	while(++ph.i < ph.nbr_philo)
 		pthread_mutex_init(&ph.mutex[ph.i], NULL);
 	ph.i = -1;
+	while(++ph.i < ph.nbr_philo)
+		ph.philo_eat[ph.i] = 0;
+	ph.i = -1;
 	gettimeofday(&ph.time, NULL);
+	gettimeofday(&ph.timepast, NULL);
 	while (++ph.i < ph.nbr_philo)
 	{
 		
 		pthread_create(&ph.th_philo[ph.i], NULL, &act_philo, &ph);
 		usleep(50);
 	}
+	pthread_create(&ph.supv, NULL, &die_sup, &ph);
 	while(1)
 	{
 		if(ph.end == ph.nbr_philo)

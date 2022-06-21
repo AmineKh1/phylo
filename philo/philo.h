@@ -23,6 +23,8 @@ typedef struct s_philo
 {
     pthread_t *th_philo;
     pthread_mutex_t *mutex;
+	int				*philo_eat;
+	pthread_t supv;
 	int tm_die;	
 	int tm_eat;
 	int tm_sleep;
@@ -35,8 +37,13 @@ typedef struct s_philo
 	int time_past;
     struct timeval  time;
 	struct timeval  timepast;
+	struct timeval  *die_calcul;
+	struct timeval  *end_die;
+	int increment;
+	int die;
 }       t_philo;
 int	time_past(t_philo *ph);
 int	msleep(t_philo *ph, int sleep);
 void*	act_philo(void *ph);
+int	time_past_bonus(t_philo *ph);
 #endif
