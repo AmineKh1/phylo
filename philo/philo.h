@@ -23,6 +23,11 @@ typedef struct s_philo
 {
     pthread_t *th_philo;
     pthread_mutex_t *mutex;
+	pthread_mutex_t mutex_print;
+	pthread_mutex_t mutex_incre;
+	pthread_mutex_t mutex_eat;
+	pthread_mutex_t mutex_timeup;
+	pthread_mutex_t end_mutex;
 	int				*philo_eat;
 	pthread_t supv;
 	int tm_die;	
