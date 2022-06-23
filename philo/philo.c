@@ -16,13 +16,13 @@
 void	msleep(t_philo *ph, int sleep)
 {
 	int past;
-	past = sleep - 20;
+	past = sleep - 30;
 	usleep(past * 1000);
 	gettimeofday(&ph->timepast, NULL);
 	sleep = sleep + ph->increment;
 	while(time_past(ph) < sleep)
 	{
-		usleep(150);
+		usleep(100);
 		gettimeofday(&ph->timepast, NULL);
 	}
 	ph->increment = time_past(ph);
@@ -99,7 +99,7 @@ void*	act_philo(void *ph)
 			pthread_mutex_unlock(&p->mutex_print);
 			gettimeofday(&p->die_calcul[i], NULL);
 			msleep(p, p->tm_eat);
-
+			
 			pthread_mutex_unlock(&p->mutex[i]);
 			pthread_mutex_unlock(&p->mutex[fork]);
 
@@ -168,9 +168,11 @@ int	main(int argc, char **argv)
 	while(++ph.i < ph.nbr_philo)
 		pthread_mutex_init(&ph.mutex[ph.i], NULL);
 	pthread_mutex_init(&ph.mutex_print, NULL);
-	ph.i = -1;
+	
 	gettimeofday(&ph.time, NULL);
 	gettimeofday(&ph.timepast, NULL);
+	
+	ph.i = -1;
 	while(++ph.i < ph.nbr_philo)
 		gettimeofday(&ph.die_calcul[ph.i], NULL);
 	ph.i = -1;
@@ -178,29 +180,27 @@ int	main(int argc, char **argv)
 	{
 		
 		pthread_create(&ph.th_philo[ph.i], NULL, &act_philo, &ph);
-		usleep(50);
+		usleep(60);
 	}
 	int i;
 	i = -1;
 	while(1)
 	{
-		
+		usleep(400);
 		while(++i < ph.nbr_philo)
 		{
 			gettimeofday(&ph.end_die[i], NULL);
 			if(time_past_die(&ph, i) >= ph.tm_die)
 			{
 				gettimeofday(&ph.timepast, NULL);
-				// pthread_mutex_unlock(&ph.mutex_print);
+				pthread_mutex_unlock(&ph.mutex_print);
 				pthread_mutex_lock(&ph.mutex_print);
-				printf("%d %d died\n", time_past(&ph), i + 1);
+				printf("%d %d died\n", time_past_die(&ph, i), i + 1);
 				ph.i = -1;
 				while(++ph.i < ph.nbr_philo)
-				{
-					pthread_detach(ph.th_philo[i]);
 					pthread_mutex_destroy(&ph.mutex[ph.i]);
-				}
 				pthread_mutex_destroy(&ph.mutex_print);
+				
 				return 0;
 			}
 		}
@@ -215,7 +215,7 @@ int	main(int argc, char **argv)
 			pthread_mutex_destroy(&ph.mutex_print);
 			return 0;
 		}
-		usleep(100);
+		// usleep(100);
 		i = -1;
 	}
 	return 0;
