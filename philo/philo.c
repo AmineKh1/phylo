@@ -26,6 +26,7 @@ void	msleep(t_philo *ph, int sleep)
 		gettimeofday(&ph->timepast, NULL);
 	}
 	ph->increment = time_past(ph);
+	// printf("---%d---\n", ph->increment);
 }
 
 int	time_past(t_philo *ph)
@@ -42,7 +43,6 @@ int	time_past_die(t_philo *ph, int i)
 	int past;
 	past = ph->end_die[i].tv_sec * 1000 + ph->end_die[i].tv_usec / 1000;
 	r = ph->die_calcul[i].tv_sec * 1000 + ph->die_calcul[i].tv_usec / 1000;
-
 	return past - r;
 }
 void*	act_philo(void *ph)
@@ -67,50 +67,39 @@ void*	act_philo(void *ph)
 		if(i % 2 == 0)
 		{
 			pthread_mutex_lock(&p->mutex[fork]);
-			pthread_mutex_lock(&p->mutex_print);
-			printf("%d %d has taken a fork\n", time_past(p), i + 1);
-			pthread_mutex_unlock(&p->mutex_print);
+			printf("%d %d has taken a left fork\n", time_past(p), i + 1);
 			pthread_mutex_lock(&p->mutex[i]);
-			pthread_mutex_lock(&p->mutex_print);
-			printf("%d %d has taken a fork\n", time_past(p), i + 1);
-			pthread_mutex_unlock(&p->mutex_print);
+			printf("%d %d has taken a right fork\n", time_past(p), i + 1);
 			gettimeofday(&p->die_calcul[i], NULL);
+			pthread_mutex_lock(&p->mutex_print);
+			printf("%d %d is eating\n", time_past(p), i + 1);
+			pthread_mutex_unlock(&p->mutex_print);
 			msleep(p, p->tm_eat);
 			
 			pthread_mutex_unlock(&p->mutex[fork]);
 			pthread_mutex_unlock(&p->mutex[i]);
-			pthread_mutex_lock(&p->mutex_print);
 			printf("%d %d is sleeping\n", time_past(p), i + 1);
-			pthread_mutex_unlock(&p->mutex_print);
 			msleep(p, p->tm_sleep);
-			pthread_mutex_lock(&p->mutex_print);
 			printf("%d %d is thinking\n", time_past(p), i + 1);
-			pthread_mutex_unlock(&p->mutex_print);
 		}
 		else  
 		{
 			pthread_mutex_lock(&p->mutex[i]);
-			pthread_mutex_lock(&p->mutex_print);
-			printf("%d %d has taken a fork\n",time_past(p), i + 1);
-			pthread_mutex_unlock(&p->mutex_print);
+			printf("%d %d has taken a right fork\n",time_past(p), i + 1);
 			pthread_mutex_lock(&p->mutex[fork]);
-			pthread_mutex_lock(&p->mutex_print);
-			printf("%d %d has taken a fork\n", time_past(p), i + 1);
-			pthread_mutex_unlock(&p->mutex_print);
+			printf("%d %d has taken a left fork\n", time_past(p), i + 1);
+			printf("%d %d is eating\n", time_past(p), i + 1);
 			gettimeofday(&p->die_calcul[i], NULL);
 			msleep(p, p->tm_eat);
+			// printf("%d\n", p->tm_eat);
 			
 			pthread_mutex_unlock(&p->mutex[i]);
 			pthread_mutex_unlock(&p->mutex[fork]);
 
-			pthread_mutex_lock(&p->mutex_print);
 			printf("%d %d is sleeping\n", time_past(p), i + 1);
-			pthread_mutex_unlock(&p->mutex_print);
 			msleep(p, p->tm_sleep);
 	
-			pthread_mutex_lock(&p->mutex_print);
 			printf("%d %d is thinking\n", time_past(p), i + 1);
-			pthread_mutex_unlock(&p->mutex_print);
 		}
 		// usleep(200);
 	}
@@ -168,7 +157,6 @@ int	main(int argc, char **argv)
 	while(++ph.i < ph.nbr_philo)
 		pthread_mutex_init(&ph.mutex[ph.i], NULL);
 	pthread_mutex_init(&ph.mutex_print, NULL);
-	
 	gettimeofday(&ph.time, NULL);
 	gettimeofday(&ph.timepast, NULL);
 	
@@ -180,22 +168,27 @@ int	main(int argc, char **argv)
 	{
 		
 		pthread_create(&ph.th_philo[ph.i], NULL, &act_philo, &ph);
-		usleep(60);
+		usleep(50);
 	}
+	ph.i = -1;
+	while (++ph.i < ph.nbr_philo)
+		pthread_detach(ph.th_philo[ph.i]);
 	int i;
-	i = -1;
+	i = 0;
 	while(1)
 	{
 		usleep(400);
-		while(++i < ph.nbr_philo)
+		i = 0;
+		while(i < ph.nbr_philo)
 		{
+			// printf("%d\n", i);
 			gettimeofday(&ph.end_die[i], NULL);
 			if(time_past_die(&ph, i) >= ph.tm_die)
 			{
 				gettimeofday(&ph.timepast, NULL);
-				pthread_mutex_unlock(&ph.mutex_print);
+				// pthread_mutex_unlock(&ph.mutex_print);
 				pthread_mutex_lock(&ph.mutex_print);
-				printf("%d %d died\n", time_past_die(&ph, i), i + 1);
+				printf("%d %d died\n", time_past(&ph), i + 1);
 				ph.i = -1;
 				while(++ph.i < ph.nbr_philo)
 					pthread_mutex_destroy(&ph.mutex[ph.i]);
@@ -203,6 +196,7 @@ int	main(int argc, char **argv)
 				
 				return 0;
 			}
+			i++;
 		}
 		if (ph.end == ph.nbr_philo)
 		{
@@ -216,7 +210,6 @@ int	main(int argc, char **argv)
 			return 0;
 		}
 		// usleep(100);
-		i = -1;
 	}
 	return 0;
 }
