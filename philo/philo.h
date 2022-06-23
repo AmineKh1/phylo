@@ -19,15 +19,12 @@
 # include <sys/time.h>
 # include <pthread.h>
 # include <unistd.h>
+# include <stdatomic.h>
 typedef struct s_philo
 {
     pthread_t *th_philo;
     pthread_mutex_t *mutex;
 	pthread_mutex_t mutex_print;
-	pthread_mutex_t mutex_incre;
-	pthread_mutex_t mutex_eat;
-	pthread_mutex_t mutex_timeup;
-	pthread_mutex_t end_mutex;
 	int				*philo_eat;
 	pthread_t supv;
 	int tm_die;	
@@ -38,17 +35,17 @@ typedef struct s_philo
 	int nbr_forks;
 	int i;
 	int ms_past;
-	int end;
+	atomic_int end;
 	int time_past;
     struct timeval  time;
 	struct timeval  timepast;
 	struct timeval  *die_calcul;
 	struct timeval  *end_die;
-	int increment;
-	int die;
+	atomic_int increment;
+	atomic_int die;
 }       t_philo;
 int	time_past(t_philo *ph);
-int	msleep(t_philo *ph, int sleep);
+void	msleep(t_philo *ph, int sleep);
 void*	act_philo(void *ph);
 int	time_past_bonus(t_philo *ph);
 #endif

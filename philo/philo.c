@@ -13,47 +13,25 @@
 #include "philo.h"
 
 
-int	msleep(t_philo *ph, int sleep)
+void	msleep(t_philo *ph, int sleep)
 {
-	// int sleep;
-	// struct timeval s;
-	// if (slp == 's')
-	// {
-	// 	sleep = ph->tm_sleep;
-	// }
-	// else if (slp == 'e')
-	// 	sleep = ph->tm_eat;
 	int past;
-	// gettimeofday(&ph->time, NULL);
-	// if(sleep > 80)
-		past = sleep - 20;
-	// else
-	// 	past = 0;
+	past = sleep - 20;
 	usleep(past * 1000);
-	// pthread_mutex_lock(&ph->mutex_timeup);
 	gettimeofday(&ph->timepast, NULL);
-	// pthread_mutex_unlock(&ph->mutex_timeup);
-	// pthread_mutex_lock(&ph->mutex_incre);
 	sleep = sleep + ph->increment;
-	// pthread_mutex_unlock(&ph->mutex_incre);
 	while(time_past(ph) < sleep)
 	{
 		usleep(150);
-		// pthread_mutex_lock(&ph->mutex_timeup);
 		gettimeofday(&ph->timepast, NULL);
-		// pthread_mutex_unlock(&ph->mutex_timeup);
 	}
-	// pthread_mutex_lock(&ph->mutex_incre);
 	ph->increment = time_past(ph);
-	// pthread_mutex_unlock(&ph->mutex_incre);
-	return ph->increment;
 }
 
 int	time_past(t_philo *ph)
 {
 	int r;
 	int past;
-
 	past = ph->timepast.tv_sec * 1000 + ph->timepast.tv_usec / 1000;
 	r = ph->time.tv_sec * 1000 + ph->time.tv_usec / 1000;
 	return past - r;
@@ -62,9 +40,9 @@ int	time_past_die(t_philo *ph, int i)
 {
 	int r;
 	int past;
-
 	past = ph->end_die[i].tv_sec * 1000 + ph->end_die[i].tv_usec / 1000;
 	r = ph->die_calcul[i].tv_sec * 1000 + ph->die_calcul[i].tv_usec / 1000;
+
 	return past - r;
 }
 void*	act_philo(void *ph)
@@ -80,7 +58,6 @@ void*	act_philo(void *ph)
 	
 	
 	j = 0;
-	// return 0;
 	while(j++ < p->tm_p_eat)
 	{
 		
@@ -91,14 +68,15 @@ void*	act_philo(void *ph)
 		{
 			pthread_mutex_lock(&p->mutex[fork]);
 			pthread_mutex_lock(&p->mutex_print);
-			printf("%d %d has taken a fork %d\n", time_past(p), i + 1, fork + 1);
+			printf("%d %d has taken a fork\n", time_past(p), i + 1);
 			pthread_mutex_unlock(&p->mutex_print);
 			pthread_mutex_lock(&p->mutex[i]);
 			pthread_mutex_lock(&p->mutex_print);
-			printf("%d %d has taken a fork %d\n", time_past(p), i + 1, i + 1);
+			printf("%d %d has taken a fork\n", time_past(p), i + 1);
 			pthread_mutex_unlock(&p->mutex_print);
-			msleep(p, p->tm_eat);
 			gettimeofday(&p->die_calcul[i], NULL);
+			msleep(p, p->tm_eat);
+			
 			pthread_mutex_unlock(&p->mutex[fork]);
 			pthread_mutex_unlock(&p->mutex[i]);
 			pthread_mutex_lock(&p->mutex_print);
@@ -113,14 +91,15 @@ void*	act_philo(void *ph)
 		{
 			pthread_mutex_lock(&p->mutex[i]);
 			pthread_mutex_lock(&p->mutex_print);
-			printf("%d %d has taken a fork %d\n",time_past(p), i + 1, i + 1);
+			printf("%d %d has taken a fork\n",time_past(p), i + 1);
 			pthread_mutex_unlock(&p->mutex_print);
 			pthread_mutex_lock(&p->mutex[fork]);
 			pthread_mutex_lock(&p->mutex_print);
-			printf("%d %d has taken a fork %d\n", time_past(p), i + 1, fork + 1);
+			printf("%d %d has taken a fork\n", time_past(p), i + 1);
 			pthread_mutex_unlock(&p->mutex_print);
-			msleep(p, p->tm_eat);
 			gettimeofday(&p->die_calcul[i], NULL);
+			msleep(p, p->tm_eat);
+
 			pthread_mutex_unlock(&p->mutex[i]);
 			pthread_mutex_unlock(&p->mutex[fork]);
 
@@ -133,38 +112,35 @@ void*	act_philo(void *ph)
 			printf("%d %d is thinking\n", time_past(p), i + 1);
 			pthread_mutex_unlock(&p->mutex_print);
 		}
+		// usleep(200);
 	}
-	pthread_mutex_lock(&p->end_mutex);
-	p->end++;
-	pthread_mutex_unlock(&p->end_mutex);
-	// printf("%d\n", i);
+	p->end = p->end + 1;
 	return 0;
 }
-void*	die_sup(void *ph)
-{
+// void*	die_sup(void *ph)
+// {
 
-	t_philo *p;
-	int i;
-	int time;
-	p = (t_philo*) ph;
-	i = -1;
-	while(1)
-	{
+// 	t_philo *p;
+// 	int i;
+// 	int time;
+// 	p = (t_philo*) ph;
+// 	i = -1;
+// 	while(1)
+// 	{
 		
-		while(++i < p->nbr_philo)
-		{
-			gettimeofday(&p->end_die[i], NULL);
-			// printf("%d\n", time_past_die(p, i));
-			if(time_past_die(p, i) >= p->tm_die)// need complite this part of implimentation of die of philo, check about philo it with the struct timeval and the algo
-			{
-				p->die = i;
+// 		while(++i < p->nbr_philo)
+// 		{
+// 			gettimeofday(&p->end_die[i], NULL);
+// 			if(time_past_die(p, i) >= p->tm_die)
+// 			{
+// 				p->die = i;
 				
-			}
+// 			}
 
-		}
-		i = -1;
-	}
-}
+// 		}
+// 		i = -1;
+// 	}
+// }
 int	main(int argc, char **argv)
 {
 	if ( argc != 6)
@@ -191,57 +167,55 @@ int	main(int argc, char **argv)
 	ph.end_die = malloc((ph.nbr_philo) * sizeof(struct timeval));
 	while(++ph.i < ph.nbr_philo)
 		pthread_mutex_init(&ph.mutex[ph.i], NULL);
-	pthread_mutex_init(&ph.mutex_incre, NULL);
 	pthread_mutex_init(&ph.mutex_print, NULL);
-	pthread_mutex_init(&ph.mutex_timeup, NULL);
-	pthread_mutex_init(&ph.end_mutex, NULL);
 	ph.i = -1;
 	gettimeofday(&ph.time, NULL);
 	gettimeofday(&ph.timepast, NULL);
+	while(++ph.i < ph.nbr_philo)
+		gettimeofday(&ph.die_calcul[ph.i], NULL);
+	ph.i = -1;
 	while (++ph.i < ph.nbr_philo)
 	{
 		
 		pthread_create(&ph.th_philo[ph.i], NULL, &act_philo, &ph);
 		usleep(50);
 	}
-	// pthread_create(&ph.supv, NULL, &die_sup, &ph);
 	int i;
 	i = -1;
 	while(1)
 	{
-		usleep(100);
+		
 		while(++i < ph.nbr_philo)
 		{
 			gettimeofday(&ph.end_die[i], NULL);
-			// printf("%d\n", time_past_die(p, i));
-			if(time_past_die(&ph, i) >= ph.tm_die)// need complite this part of implimentation of die of philo, check about philo it with the struct timeval and the algo
+			if(time_past_die(&ph, i) >= ph.tm_die)
 			{
+				gettimeofday(&ph.timepast, NULL);
+				// pthread_mutex_unlock(&ph.mutex_print);
 				pthread_mutex_lock(&ph.mutex_print);
 				printf("%d %d died\n", time_past(&ph), i + 1);
 				ph.i = -1;
 				while(++ph.i < ph.nbr_philo)
+				{
+					pthread_detach(ph.th_philo[i]);
 					pthread_mutex_destroy(&ph.mutex[ph.i]);
-				pthread_mutex_destroy(&ph.mutex_incre);
-				pthread_mutex_destroy(&ph.mutex_timeup);
+				}
 				pthread_mutex_destroy(&ph.mutex_print);
-				pthread_mutex_destroy(&ph.end_mutex);
 				return 0;
 			}
-			
-			
-
 		}
 		if (ph.end == ph.nbr_philo)
 		{
 			ph.i = -1;
 			while(++ph.i < ph.nbr_philo)
+			{
+				pthread_detach(ph.th_philo[i]);
 				pthread_mutex_destroy(&ph.mutex[ph.i]);
-			pthread_mutex_destroy(&ph.mutex_incre);
-			pthread_mutex_destroy(&ph.mutex_timeup);
+			}
 			pthread_mutex_destroy(&ph.mutex_print);
-			pthread_mutex_destroy(&ph.end_mutex);
 			return 0;
 		}
+		usleep(100);
 		i = -1;
 	}
 	return 0;
