@@ -1,215 +1,146 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   philo.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: akhouya <akhouya@student.1337.ma>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/15 11:03:44 by akhouya           #+#    #+#             */
-/*   Updated: 2022/06/15 13:57:10 by akhouya          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+/* ************************************************************************************************ */
+/*                                                                                                  */
+/*                                                        :::   ::::::::   ::::::::  :::::::::::    */
+/*   philo.c                                           :+:+:  :+:    :+: :+:    :+: :+:     :+:     */
+/*                                                      +:+         +:+        +:+        +:+       */
+/*   By: akhouya <akhouya@student.1337.ma>             +#+      +#++:      +#++:        +#+         */
+/*                                                    +#+         +#+        +#+      +#+           */
+/*   Created: Invalid date        by                 #+#  #+#    #+# #+#    #+#     #+#             */
+/*   Updated: 2022/06/24 10:47:05 by akhouya      ####### ########   ########      ###.ma           */
+/*                                                                                                  */
+/* ************************************************************************************************ */
 
 #include "philo.h"
 
-
-void	msleep(t_philo *ph, int sleep)
+void	 msleep(int sleep)
 {
 	int past;
+	struct timeval before;
+	struct timeval after;
 	past = sleep - 30;
+
+	gettimeofday(&before, NULL);
+	
 	usleep(past * 1000);
-	gettimeofday(&ph->timepast, NULL);
-	sleep = sleep + ph->increment;
-	while(time_past(ph) < sleep)
+	gettimeofday(&after, NULL);
+	while (time_past(before, after) < sleep)
 	{
 		usleep(100);
-		gettimeofday(&ph->timepast, NULL);
+		gettimeofday(&after, NULL);
 	}
-	ph->increment = time_past(ph);
-	// printf("---%d---\n", ph->increment);
 }
 
-int	time_past(t_philo *ph)
+int time_past(struct timeval before, struct timeval after)
 {
 	int r;
 	int past;
-	past = ph->timepast.tv_sec * 1000 + ph->timepast.tv_usec / 1000;
-	r = ph->time.tv_sec * 1000 + ph->time.tv_usec / 1000;
-	return past - r;
-}
-int	time_past_die(t_philo *ph, int i)
-{
-	int r;
-	int past;
-	past = ph->end_die[i].tv_sec * 1000 + ph->end_die[i].tv_usec / 1000;
-	r = ph->die_calcul[i].tv_sec * 1000 + ph->die_calcul[i].tv_usec / 1000;
-	return past - r;
-}
-void*	act_philo(void *ph)
-{
-	int i;
-	
-	t_philo *p;
-	p = (t_philo*) ph;
-	i = p->i;
-	int fork;
-	int count = 0;
-	int j;
-	
-	
-	j = 0;
-	while(j++ < p->tm_p_eat)
-	{
-		
-		fork = i + 1;
-		if (fork > p->nbr_philo - 1)
-			fork = 0;
-		if(i % 2 == 0)
-		{
-			pthread_mutex_lock(&p->mutex[fork]);
-			printf("%d %d has taken a left fork\n", time_past(p), i + 1);
-			pthread_mutex_lock(&p->mutex[i]);
-			printf("%d %d has taken a right fork\n", time_past(p), i + 1);
-			gettimeofday(&p->die_calcul[i], NULL);
-			pthread_mutex_lock(&p->mutex_print);
-			printf("%d %d is eating\n", time_past(p), i + 1);
-			pthread_mutex_unlock(&p->mutex_print);
-			msleep(p, p->tm_eat);
-			
-			pthread_mutex_unlock(&p->mutex[fork]);
-			pthread_mutex_unlock(&p->mutex[i]);
-			printf("%d %d is sleeping\n", time_past(p), i + 1);
-			msleep(p, p->tm_sleep);
-			printf("%d %d is thinking\n", time_past(p), i + 1);
-		}
-		else  
-		{
-			pthread_mutex_lock(&p->mutex[i]);
-			printf("%d %d has taken a right fork\n",time_past(p), i + 1);
-			pthread_mutex_lock(&p->mutex[fork]);
-			printf("%d %d has taken a left fork\n", time_past(p), i + 1);
-			printf("%d %d is eating\n", time_past(p), i + 1);
-			gettimeofday(&p->die_calcul[i], NULL);
-			msleep(p, p->tm_eat);
-			// printf("%d\n", p->tm_eat);
-			
-			pthread_mutex_unlock(&p->mutex[i]);
-			pthread_mutex_unlock(&p->mutex[fork]);
 
-			printf("%d %d is sleeping\n", time_past(p), i + 1);
-			msleep(p, p->tm_sleep);
-	
-			printf("%d %d is thinking\n", time_past(p), i + 1);
-		}
-		// usleep(200);
-	}
-	p->end = p->end + 1;
-	return 0;
+	past = after.tv_sec * 1000 + after.tv_usec / 1000;
+	r = before.tv_sec * 1000 + before.tv_usec / 1000;
+	r = past - r;
+	return (r);
 }
-// void*	die_sup(void *ph)
-// {
 
-// 	t_philo *p;
-// 	int i;
-// 	int time;
-// 	p = (t_philo*) ph;
-// 	i = -1;
-// 	while(1)
-// 	{
-		
-// 		while(++i < p->nbr_philo)
-// 		{
-// 			gettimeofday(&p->end_die[i], NULL);
-// 			if(time_past_die(p, i) >= p->tm_die)
-// 			{
-// 				p->die = i;
-				
-// 			}
-
-// 		}
-// 		i = -1;
-// 	}
-// }
-int	main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-	if ( argc != 6)
+	if (argc != 5 && argc != 6)
 	{
 		perror("Error\n");
-		return 1;
+		return (1);
 	}
-	t_philo ph;
+	t_philo *ph;
 
-	
-	ph.i = -1;
-	ph.die = -1;
-	ph.tm_die = atoi(argv[2]);	
-	ph.tm_eat = atoi(argv[3]);
-	ph.tm_sleep = atoi(argv[4]);
-	ph.tm_p_eat = atoi(argv[5]);
-	ph.nbr_philo = atoi(argv[1]);
-	ph.nbr_forks = atoi(argv[1]);
-	ph.end = 0;
-	ph.increment = 0;
-	ph.th_philo = malloc ((ph.nbr_philo) * sizeof(pthread_t));
-	ph.mutex = malloc((ph.nbr_philo) * sizeof(pthread_mutex_t));
-	ph.die_calcul = malloc((ph.nbr_philo) * sizeof(struct timeval));
-	ph.end_die = malloc((ph.nbr_philo) * sizeof(struct timeval));
-	while(++ph.i < ph.nbr_philo)
-		pthread_mutex_init(&ph.mutex[ph.i], NULL);
-	pthread_mutex_init(&ph.mutex_print, NULL);
-	gettimeofday(&ph.time, NULL);
-	gettimeofday(&ph.timepast, NULL);
-	
-	ph.i = -1;
-	while(++ph.i < ph.nbr_philo)
-		gettimeofday(&ph.die_calcul[ph.i], NULL);
-	ph.i = -1;
-	while (++ph.i < ph.nbr_philo)
+	ph = malloc(sizeof(t_philo));
+	if (!ph)
+		return (1);
+	ph->tm_die = atoi(argv[2]);
+	ph->tm_eat = atoi(argv[3]);
+	ph->tm_sleep = atoi(argv[4]);
+	ph->nbr_philo = atoi(argv[1]);
+	ph->tm_p_eat = -1;
+	ph->die = -1;
+	ph->end = 0;
+	if (argc == 6)
+		ph->tm_p_eat = atoi(argv[5]);
+	ph->th_philo = malloc((ph->nbr_philo) * sizeof(pthread_t));
+	ph->mutex = malloc((ph->nbr_philo) * sizeof(pthread_mutex_t));
+	ph->die_calcul = malloc((ph->nbr_philo) * sizeof(struct timeval));
+	ph->end_die = malloc((ph->nbr_philo) * sizeof(struct timeval));
+
+	if (!ph->th_philo || !ph->mutex || !ph->die_calcul)
+		return 1;
+	ph->i = -1;
+	while (++ph->i < ph->nbr_philo)
 	{
-		
-		pthread_create(&ph.th_philo[ph.i], NULL, &act_philo, &ph);
-		usleep(50);
+		if (pthread_mutex_init(&ph->mutex[ph->i], NULL) != 0)
+		{
+			mutex_destroy_forks(ph);
+			return (1);
+		}
 	}
-	ph.i = -1;
-	while (++ph.i < ph.nbr_philo)
-		pthread_detach(ph.th_philo[ph.i]);
+	if (pthread_mutex_init(&ph->mutex_print, NULL) != 0)
+	{
+		destroy_mutex(ph);
+		return (1);
+	}
+	if( gettimeofday(&ph->time, NULL) == -1 || gettimeofday(&ph->timepast, NULL) == -1)
+	{	
+		destroy_mutex(ph);
+		return (1);
+	}
+	ph->i = -1;
+	while(++ph->i < ph->nbr_philo)
+	{
+		if(gettimeofday(&ph->die_calcul[ph->i], NULL) != 0)
+		{
+			destroy_mutex(ph);
+			return (1);
+		}
+	}
+	ph->i = -1;
+	while(++ph->i < ph->nbr_philo)
+	{
+		if(pthread_create(&ph->th_philo[ph->i], NULL, &act_philo, ph) != 0)
+		{	
+			destroy_mutex(ph);
+			return (1);
+		}
+		usleep(40);
+	}
+	ph->i = -1;
+	while (++ph->i < ph->nbr_philo)
+	{
+		if (pthread_detach(ph->th_philo[ph->i]) != 0)
+		{
+			destroy_mutex(ph);
+			return (1);
+		}
+	}
 	int i;
 	i = 0;
 	while(1)
 	{
-		usleep(400);
-		i = 0;
-		while(i < ph.nbr_philo)
+		i = -1;
+		while(++i < ph->nbr_philo)
 		{
-			// printf("%d\n", i);
-			gettimeofday(&ph.end_die[i], NULL);
-			if(time_past_die(&ph, i) >= ph.tm_die)
+			gettimeofday(&ph->end_die[i], NULL);
 			{
-				gettimeofday(&ph.timepast, NULL);
-				// pthread_mutex_unlock(&ph.mutex_print);
-				pthread_mutex_lock(&ph.mutex_print);
-				printf("%d %d died\n", time_past(&ph), i + 1);
-				ph.i = -1;
-				while(++ph.i < ph.nbr_philo)
-					pthread_mutex_destroy(&ph.mutex[ph.i]);
-				pthread_mutex_destroy(&ph.mutex_print);
-				
-				return 0;
+				if (time_past(ph->die_calcul[i], ph->end_die[i]) >= ph->tm_die)
+				{
+					gettimeofday(&ph->timepast, NULL);
+					pthread_mutex_unlock(&ph->mutex_print);
+					pthread_mutex_lock(&ph->mutex_print);
+					printf("%d %d died\n", time_past(ph->time, ph->timepast), i + 1);
+					destroy_mutex(ph);
+					return 0;
+				}
+
 			}
-			i++;
 		}
-		if (ph.end == ph.nbr_philo)
+		if (ph->end == ph->nbr_philo)
 		{
-			ph.i = -1;
-			while(++ph.i < ph.nbr_philo)
-			{
-				pthread_detach(ph.th_philo[i]);
-				pthread_mutex_destroy(&ph.mutex[ph.i]);
-			}
-			pthread_mutex_destroy(&ph.mutex_print);
+			destroy_mutex(ph);
 			return 0;
 		}
-		// usleep(100);
 	}
-	return 0;
 }
