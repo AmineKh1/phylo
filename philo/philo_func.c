@@ -35,20 +35,15 @@ void    thread(t_philo *p, int i, int fork, int j)
     pthread_mutex_lock(&p->mutex_print);
     printf("%d %d has taken fork\n", time_past(p->time, p->timepast), i + 1);
     pthread_mutex_unlock(&p->mutex_print);
-
     pthread_mutex_lock(&p->mutex[fork]);
-
     pthread_mutex_lock(&p->mutex_print);
     printf("%d %d has taken fork\n", time_past(p->time, p->timepast), i + 1);
     pthread_mutex_unlock(&p->mutex_print);
-
     pthread_mutex_lock(&p->mutex_print);
     printf("%d %d is eating\n", time_past(p->time, p->timepast), i + 1);
     pthread_mutex_unlock(&p->mutex_print);
     gettimeofday(&p->die_calcul[i], NULL);
     msleep(p->tm_eat);
-    
-    ;
     pthread_mutex_unlock(&p->mutex[fork]);
     pthread_mutex_unlock(&p->mutex[i]);
     if(j == 1)
@@ -58,7 +53,6 @@ void    thread(t_philo *p, int i, int fork, int j)
     printf("%d %d is sleeping\n", time_past(p->time, p->timepast), i + 1);
     pthread_mutex_unlock(&p->mutex_print);  
     msleep(p->tm_sleep);
-    
     pthread_mutex_lock(&p->mutex_print);
     gettimeofday(&p->timepast, NULL);
     printf("%d %d is thinking\n", time_past(p->time, p->timepast), i + 1);
@@ -99,4 +93,40 @@ void*   act_philo(void *ph)
     }
    
     return 0;
+}
+
+static int	calcule(const char *nptr, int sign)
+{
+	unsigned long	r;
+
+	r = 0;
+	while (*nptr >= '0' && *nptr <= '9')
+	{
+		r = r * 10;
+		r = r + (*nptr - '0');
+		nptr++;
+	}
+	if ((r > 2147483647 && sign == 1) || (r > 2147483648 && sign == -1))
+		return (-2);
+	return ((int)r * sign);
+}
+
+int	ft_atoi(const char *nptr)
+{
+	unsigned long	r;
+	int				signe;
+
+	r = 0;
+	signe = 1;
+	while (*nptr == ' ' || *nptr == '\t' || *nptr == '\v' || *nptr == '\r'
+		|| *nptr == '\n' || *nptr == '\f')
+		nptr++;
+	if (*nptr == '-')
+	{
+		return (-2);
+	}
+	else if (*nptr == '+')
+		return (-2);
+	r = calcule(nptr, signe);
+	return (r);
 }
