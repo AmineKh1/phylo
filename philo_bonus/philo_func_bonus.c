@@ -53,12 +53,16 @@ static int	calcule(const char *nptr, int sign)
 	unsigned long	r;
 
 	r = 0;
+	if(*nptr < '0' || *nptr > '9')
+        return (-2);
 	while (*nptr >= '0' && *nptr <= '9')
 	{
 		r = r * 10;
 		r = r + (*nptr - '0');
 		nptr++;
 	}
+	if((*nptr < '0' || *nptr > '9') && *nptr != '\0')
+            return (-2);
 	if ((r > 2147483647 && sign == 1) || (r > 2147483648 && sign == -1))
 		return (-2);
 	return ((int)r * sign);
@@ -71,13 +75,8 @@ int	ft_atoi(const char *nptr)
 
 	r = 0;
 	signe = 1;
-	while (*nptr == ' ' || *nptr == '\t' || *nptr == '\v' || *nptr == '\r'
-		|| *nptr == '\n' || *nptr == '\f')
-		nptr++;
 	if (*nptr == '-')
-	{
 		return (-2);
-	}
 	else if (*nptr == '+')
 		return (-2);
 	r = calcule(nptr, signe);

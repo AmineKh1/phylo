@@ -1,6 +1,6 @@
 NAME = philo
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror 
 SRC = philo_func.c philo.c
 SRCB = 
 OBJ = ${SRC:.c=.o}
