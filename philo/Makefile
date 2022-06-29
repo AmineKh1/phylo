@@ -1,7 +1,7 @@
 NAME = philo
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror 
-SRC = philo_func.c philo.c
+SRC = philo_func.c philo.c philo_func1.c destroy_mutex.c
 SRCB = 
 OBJ = ${SRC:.c=.o}
 RM = rm -f
