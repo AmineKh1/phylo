@@ -6,7 +6,7 @@
 /*   By: akhouya <akhouya@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/29 10:07:09 by akhouya           #+#    #+#             */
-/*   Updated: 2022/06/29 10:11:49 by akhouya          ###   ########.fr       */
+/*   Updated: 2022/06/29 12:17:28 by akhouya          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int	init_var(t_philo *ph, char **argv, int argc)
 	ph->mutex = malloc((ph->nbr_philo) * sizeof(pthread_mutex_t));
 	ph->die_calcul = malloc((ph->nbr_philo) * sizeof(struct timeval));
 	ph->end_die = malloc((ph->nbr_philo) * sizeof(struct timeval));
-	if (!ph->th_philo || !ph->mutex || !ph->die_calcul)
+	if (!ph->th_philo || !ph->mutex || !ph->die_calcul || !ph->end_die)
 		return (1);
 	if (ph->tm_die == -2 || ph->tm_eat == -2 || ph->tm_sleep == -2
 		|| ph->tm_p_eat == -2 || ph->nbr_philo == -2)

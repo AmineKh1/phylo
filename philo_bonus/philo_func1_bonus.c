@@ -6,7 +6,7 @@
 /*   By: akhouya <akhouya@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/29 11:02:18 by akhouya           #+#    #+#             */
-/*   Updated: 2022/06/29 11:57:09 by akhouya          ###   ########.fr       */
+/*   Updated: 2022/06/29 12:18:20 by akhouya          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ void	init_var(t_philo *ph, int argc, char **argv)
 	sem_unlink(PRINT);
 	sem_unlink(DIE);
 	ph->th_philo = malloc((ph->nbr_philo) * sizeof(pthread_t));
+	if (!ph->th_philo)
+		exit(1);
 	ph->fork = sem_open(FORK, O_CREAT, 0664, ph->nbr_philo);
 	ph->print = sem_open(PRINT, O_CREAT, 0664, 1);
 	ph->die = sem_open(DIE, O_CREAT, 0664, 1);

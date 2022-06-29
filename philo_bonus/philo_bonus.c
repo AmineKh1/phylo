@@ -6,7 +6,7 @@
 /*   By: akhouya <akhouya@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/29 10:49:40 by akhouya           #+#    #+#             */
-/*   Updated: 2022/06/29 11:50:18 by akhouya          ###   ########.fr       */
+/*   Updated: 2022/06/29 12:19:51 by akhouya          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,10 +81,7 @@ int	main(int argc, char **argv)
 	int		j;
 
 	if (argc != 5 && argc != 6)
-	{
-		write(2, "Error\n", 6);
 		return (1);
-	}
 	j = 0;
 	ph = malloc(sizeof(t_philo));
 	if (!ph)
