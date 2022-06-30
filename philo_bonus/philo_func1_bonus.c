@@ -6,7 +6,7 @@
 /*   By: akhouya <akhouya@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/29 11:02:18 by akhouya           #+#    #+#             */
-/*   Updated: 2022/06/29 12:18:20 by akhouya          ###   ########.fr       */
+/*   Updated: 2022/06/29 15:02:44 by akhouya          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ void	create_process(t_philo *ph, int j)
 		ph->th_philo[ph->i] = fork();
 		if (ph->th_philo[ph->i] == 0)
 			philo_process(ph);
+		usleep(150);
 	}
 	ph->i = -1;
 	while (j < ph->nbr_philo)

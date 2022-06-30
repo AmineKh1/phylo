@@ -6,7 +6,7 @@
 /*   By: akhouya <akhouya@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/29 10:06:56 by akhouya           #+#    #+#             */
-/*   Updated: 2022/06/29 11:58:37 by akhouya          ###   ########.fr       */
+/*   Updated: 2022/06/29 12:31:42 by akhouya          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	create_thread(t_philo *ph)
 			destroy_mutex(ph);
 			return (1);
 		}
-		usleep(100);
+		usleep(50);
 	}
 	ph->i = -1;
 	while (++ph->i < ph->nbr_philo)
@@ -64,9 +64,9 @@ int	spv_die(t_philo *ph, int i)
 	while (1)
 	{
 		i = -1;
-		usleep(300);
 		while (++i < ph->nbr_philo)
 		{
+			usleep(800);
 			gettimeofday(&ph->end_die[i], NULL);
 			if (time_past(ph->die_calcul[i], ph->end_die[i]) >= ph->tm_die)
 			{
